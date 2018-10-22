@@ -1,0 +1,118 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+ifstream fin("sudoku.in");
+ofstream fout ("sudoku.out");
+int a[10][10];
+struct elem
+{
+    int lin,col,val;
+}sol[100];
+int nr;
+void citire ()
+{
+    int i,j;
+    for (i=1;i<=9;i++)
+        for (j=1;j<=9;j++)
+    {
+        fin>>a[i][j];
+        if (a[i][j]==0)
+        {
+            nr++;
+            sol[nr].lin=i;
+            sol[nr].col=j;
+            sol[nr].val=0;
+        }
+    }
+}
+void afisare()
+{
+    int i,j;
+    for (i=1;i<=9;i++)
+    {
+        for (j=1;j<=9;j++)
+            fout<<a[i][j]<<' ';
+        fout<<'\n';
+    }
+    exit(0);
+}
+int verific(int candidat,int k)
+{
+    int lmin,lmax,cmin,cmax,i,j;
+    //search for a square of 3*3
+    if (sol[k].lin<=3)
+    {
+        lmin=1;
+        lmax=3;
+    }
+    else
+        if (sol[k].lin<=6)
+    {
+        lmin=4;
+        lmax=6;
+    }
+        else
+        {
+            lmin=7;
+            lmax=9;
+        }
+    if (sol[k].col<=3)
+    {
+        cmin=1;
+        cmax=3;
+    }
+    else
+        if (sol[k].col<=6)
+    {
+        cmin=4;
+        cmax=6;
+    }
+        else
+        {
+            cmin=7;
+            cmax=9;
+        }
+    // I verify the found square
+    for (i=lmin;i<=lmax;i++)
+        for (j=cmin;j<=cmax;j++)
+        {
+            if (a[i][j]==candidat)
+            return 0;
+        }
+    //verify the row sol[k].lin
+    for (j=1;j<=9;j++)
+        if (a[sol[k].lin][j]==candidat)
+        return 0;
+    // verify the column sol[k].col
+    for (i=1;i<=9;i++)
+        if (a[i][sol[k].col]==candidat)
+        return 0;
+    return 1;
+}
+void sudoku(int k)
+{
+    int candidat;
+    if (k==nr+1)
+        afisare();
+    else
+    {
+        for (candidat=1;candidat<=9;candidat++)
+        {
+            if (verific(candidat,k))
+            {
+                sol[k].val=candidat;
+                a[sol[k].lin][sol[k].col]=candidat;
+                sudoku(k+1);
+                sol[k].val=0;
+                a[sol[k].lin][sol[k].col]=0;
+            }
+        }
+    }
+}
+int main()
+{
+    citire();
+    sudoku(1);
+    afisare();
+    return 0;
+}
