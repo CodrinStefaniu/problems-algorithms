@@ -1,2 +1,4 @@
 # problems-algorithms
-Repository dedicated to problem solving.
+
+Hey there!
+In this repository I post interesting problems and algorithms which I have found challenging.
