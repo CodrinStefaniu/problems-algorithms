@@ -1,0 +1,132 @@
+#include <fstream>
+#include <cstdlib>
+
+using namespace std;
+
+ifstream fin("soarece2.in");
+ofstream fout("soarece2.out");
+
+short int T[1010][1010];
+short int dl[] = {-1, 0, 1, 0}, dc[] = {0, 1, 0, -1};
+int xB, yB, n, m, i, xS, yS, lc, cc, q = 1, gasit = 0;
+
+int V[100000];
+struct element
+    {
+        short int l, c;
+        int pasi;
+    } C[1000000], X;
+
+void citire()
+{                                      //read and interpret the board
+    int i, j;
+    char c;
+    fin >> n >> m;                     //dimensions
+    for (i = 1; i <= n; i++)
+    {
+        fin.get();                     //read the enter
+        for (j = 1; j <= m; j++)
+        {
+            fin.get(c);
+            if (c == '_') T[i][j] = 0; //free space (can move there)
+            if (c == '#') T[i][j] = -1;//obstacle
+            if (c == 'S')              //rat's position
+            {
+                T[i][j] = 1;           //I mark with 1 the position from where it leaves
+                xS = i;                //memorise the position (xS, yS)
+                yS = j;
+            }
+            if (c == 'B')              //here is the CHEESE 
+            {
+                T[i][j] = -2;          //mark with -2
+                xB = i;                //memorise the position (xB, yB)
+                yB = j;
+            }
+        }
+    }
+}
+
+void Plimba_Soarece()
+{
+    int ic = 0, sc = -1, k;
+    int l9, c9;
+
+    sc++;                               //put in the "queue" data structure the element
+    C[sc].l = xS;
+    C[sc].c = yS;
+    C[sc].pasi = 1;
+    while (ic <= sc)                    //while I still have elements in the queue
+    {
+        X = C[ic++];                    //take the first element out of the queue
+        for (k = 0; k < 4; k++)         //try going in the 4 directions
+        {
+            l9 = X.l + dl[k];           //determine the new coordinates
+            c9 = X.c + dc[k];
+            if (T[l9][c9] == 0 || T[l9][c9]==-2)
+            {   //If in the new position it is free or cheese
+                T[l9][c9] = X.pasi + 1; //can get in there
+                sc++;                   //put the element in queue so that I can continue 
+                C[sc].l = l9;
+                C[sc].c = c9;
+                C[sc].pasi = X.pasi + 1;
+            }
+        }
+    }
+}
+
+void cauta_drum()
+{//to determine the road I go backwards from B (cheese) to S (start)
+    int k;
+    lc = xB; //current location of row
+    cc = yB; //current location of column
+    if (T[xB][yB] != -2)               //this means I found the CHEESE
+        while (!(lc == xS && cc == yS))//while I haven't got to the rat's position
+        {
+            for (k = 0; k <= 3; k++)   //try all the four directions
+            {
+                if(T[lc+dl[k]][cc+dc[k]] == T[lc][cc] - 1)//if I find the previous step 
+                {                                         //being with 1 less,
+                    V[q++] = k;                           //I move there
+                    lc = lc + dl[k]; cc = cc + dc[k];     //mark that I found it
+                    gasit = 1;                            //get out of the for loop
+                    break;                                //using break
+                }
+            }
+        }
+    else
+    {
+        fout << 0 << '\n';  //Rat didn't get to the Cheese
+        exit(0);
+    }
+}
+
+void afiseaza()
+{
+    fout << q - 1 << '\n';
+    for (i = q - 1; i >= 1; i--)
+    {
+        if (V[i] == 0) fout << 'S';
+        if (V[i] == 1) fout << 'V';
+        if (V[i] == 2) fout << 'N';
+        if (V[i] == 3) fout << 'E';
+    }
+}
+
+void bordare()
+{
+    int i;
+    for (i = 0; i <= n + 1; i++)
+        T[i][0] = T[i][ m +1] = -1;
+    for (i = 0; i <= m + 1; i++)
+        T[0][i] = T[n + 1][i] = -1;
+}
+
+int main()
+{
+    citire();
+    bordare();
+    Plimba_Soarece();
+    cauta_drum();
+    afiseaza();
+    return 0;
+}
