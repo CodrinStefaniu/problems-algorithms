@@ -1,0 +1,38 @@
+#include <fstream>
+
+using namespace std;
+
+ifstream fin ("BFS.in");
+ofstream fout ("BFS.out");
+int n,m,x,a,b,viz[100],C[100],mat[100][100];
+void BFS(int x)
+{
+    int i,prim=0,ultim=0;
+    fout<<x<<' ';
+    viz[x]=1;
+    C[0]=x;
+    while (prim<=ultim)
+    {
+        x=C[prim++];
+        for (i=1;i<=n;i++)
+            if (!viz[i]&& mat[x][i])
+        {
+            fout<<i<<' ';
+            viz[i]=1;
+            C[++ultim]=i;
+        }
+    }
+}
+int main()
+{
+    int i;
+    fin>>n>>m>>x;
+    for (i=1;i<=m;i++)
+    {
+        fin>>a>>b;
+        mat[a][b]=1;
+        mat[b][a]=1;
+    }
+    BFS(x);
+    return 0;
+}
